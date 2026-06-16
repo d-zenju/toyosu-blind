@@ -190,3 +190,14 @@ body {
   font-size: 0.85rem;
   color: #2e7d32;
 }
+
+#version-label {
+  position: fixed;
+  bottom: 0.4rem;
+  right: 0.5rem;
+  font-size: 0.65rem;
+  color: #aaa;
+  font-family: monospace;
+  pointer-events: none;
+  z-index: 100;
+}
