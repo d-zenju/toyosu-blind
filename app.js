@@ -1,7 +1,19 @@
-import { GEOJSON_PATH, THRESHOLDS, ACCURACY_WARN_M } from './config.js';
+import { GEOJSON_PATH } from './config.js';
 import { createGeofence } from './geo-utils.js';
 import { classifyState } from './state.js';
 import { createBeeper } from './audio.js';
+import {
+  DEFAULT_SETTINGS,
+  loadSettings,
+  saveSettings,
+  clearSettings,
+  loadStoredGeojson,
+  saveGeojson,
+  clearStoredGeojson,
+  getStoredGeojsonName,
+  saveGeojsonName,
+  clearGeojsonName,
+} from './settings.js';
 
 const STATE_LABELS = {
   safe: '安全',
@@ -27,6 +39,25 @@ const debugHeadingValue = document.getElementById('debug-heading-value');
 const debugSpeed = document.getElementById('debug-speed');
 const debugSpeedValue = document.getElementById('debug-speed-value');
 
+const sCautionM = document.getElementById('s-caution-m');
+const sWarningM = document.getElementById('s-warning-m');
+const sDangerOutsideM = document.getElementById('s-danger-outside-m');
+const sCautionTtbS = document.getElementById('s-caution-ttb-s');
+const sWarningTtbS = document.getElementById('s-warning-ttb-s');
+const sMinSpeedMps = document.getElementById('s-min-speed-mps');
+const sAccuracyWarnM = document.getElementById('s-accuracy-warn-m');
+const sCautionFreqHz = document.getElementById('s-caution-freq-hz');
+const sCautionIntervalMs = document.getElementById('s-caution-interval-ms');
+const sWarningFreqHz = document.getElementById('s-warning-freq-hz');
+const sWarningIntervalMs = document.getElementById('s-warning-interval-ms');
+const sDangerFreqHz = document.getElementById('s-danger-freq-hz');
+const sGeojsonFile = document.getElementById('s-geojson-file');
+const sGeojsonStatus = document.getElementById('s-geojson-status');
+const sGeojsonClear = document.getElementById('s-geojson-clear');
+const sSave = document.getElementById('s-save');
+const sReset = document.getElementById('s-reset');
+const sSaveStatus = document.getElementById('s-save-status');
+
 debugHeading.addEventListener('input', () => {
   debugHeadingValue.textContent = debugHeading.value;
 });
@@ -42,8 +73,82 @@ function showError(message) {
   errorMessage.textContent = message;
 }
 
-function updateUi({ inside, distanceToEdge, bearingToEdge }, accuracy, motion = null) {
-  const state = classifyState({ inside, distanceToEdge, bearingToEdge }, THRESHOLDS, motion);
+function populateSettingsForm(settings) {
+  sCautionM.value = settings.cautionM;
+  sWarningM.value = settings.warningM;
+  sDangerOutsideM.value = settings.dangerOutsideM;
+  sCautionTtbS.value = settings.cautionTtbS;
+  sWarningTtbS.value = settings.warningTtbS;
+  sMinSpeedMps.value = settings.minSpeedMps;
+  sAccuracyWarnM.value = settings.accuracyWarnM;
+  sCautionFreqHz.value = settings.cautionFreqHz;
+  sCautionIntervalMs.value = settings.cautionIntervalMs;
+  sWarningFreqHz.value = settings.warningFreqHz;
+  sWarningIntervalMs.value = settings.warningIntervalMs;
+  sDangerFreqHz.value = settings.dangerFreqHz;
+}
+
+function readSettingsForm() {
+  return {
+    cautionM: Number(sCautionM.value),
+    warningM: Number(sWarningM.value),
+    dangerOutsideM: Number(sDangerOutsideM.value),
+    cautionTtbS: Number(sCautionTtbS.value),
+    warningTtbS: Number(sWarningTtbS.value),
+    minSpeedMps: Number(sMinSpeedMps.value),
+    accuracyWarnM: Number(sAccuracyWarnM.value),
+    cautionFreqHz: Number(sCautionFreqHz.value),
+    cautionIntervalMs: Number(sCautionIntervalMs.value),
+    warningFreqHz: Number(sWarningFreqHz.value),
+    warningIntervalMs: Number(sWarningIntervalMs.value),
+    dangerFreqHz: Number(sDangerFreqHz.value),
+  };
+}
+
+function updateGeojsonStatus() {
+  const name = getStoredGeojsonName();
+  sGeojsonStatus.textContent = name ? `カスタム: ${name}` : `デフォルト (toyosu.geojson)`;
+}
+
+sSave.addEventListener('click', () => {
+  saveSettings(readSettingsForm());
+  sSaveStatus.textContent = '保存しました';
+  setTimeout(() => { sSaveStatus.textContent = ''; }, 2000);
+});
+
+sReset.addEventListener('click', () => {
+  clearSettings();
+  populateSettingsForm(DEFAULT_SETTINGS);
+  sSaveStatus.textContent = 'デフォルトに戻しました';
+  setTimeout(() => { sSaveStatus.textContent = ''; }, 2000);
+});
+
+sGeojsonFile.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const geojson = JSON.parse(e.target.result);
+      saveGeojson(geojson);
+      saveGeojsonName(file.name);
+      updateGeojsonStatus();
+    } catch {
+      showError('GeoJSONの解析に失敗しました');
+    }
+  };
+  reader.readAsText(file);
+});
+
+sGeojsonClear.addEventListener('click', () => {
+  clearStoredGeojson();
+  clearGeojsonName();
+  sGeojsonFile.value = '';
+  updateGeojsonStatus();
+});
+
+function updateUi({ inside, distanceToEdge, bearingToEdge }, accuracyWarnM, accuracy, thresholds, motion = null) {
+  const state = classifyState({ inside, distanceToEdge, bearingToEdge }, thresholds, motion);
 
   statusScreen.classList.remove('state-safe', 'state-caution', 'state-warning', 'state-danger');
   statusScreen.classList.add(`state-${state}`);
@@ -53,18 +158,18 @@ function updateUi({ inside, distanceToEdge, bearingToEdge }, accuracy, motion = 
   const relativeAngle = ((bearingToEdge - heading) % 360 + 360) % 360;
   directionArrow.style.transform = `rotate(${relativeAngle}deg)`;
 
-  const lowAccuracy = accuracy != null && accuracy > ACCURACY_WARN_M;
+  const lowAccuracy = accuracy != null && accuracy > accuracyWarnM;
   accuracyNotice.classList.toggle('visible', lowAccuracy);
 
   beeper.setState(state);
 }
 
-function handlePosition(lat, lon, accuracy, speed = null, motionHeading = null) {
+function handlePosition(lat, lon, accuracy, speed = null, motionHeading = null, settings, thresholds) {
   const result = geofence.evaluate({ lat, lon });
-  updateUi(result, accuracy, { speed, heading: motionHeading });
+  updateUi(result, settings.accuracyWarnM, accuracy, thresholds, { speed, heading: motionHeading });
 }
 
-function startGeolocationWatch() {
+function startGeolocationWatch(settings, thresholds) {
   navigator.geolocation.watchPosition(
     (position) => {
       handlePosition(
@@ -73,6 +178,8 @@ function startGeolocationWatch() {
         position.coords.accuracy,
         position.coords.speed,
         position.coords.heading,
+        settings,
+        thresholds,
       );
     },
     (error) => {
@@ -82,7 +189,7 @@ function startGeolocationWatch() {
   );
 }
 
-function startDebugLoop() {
+function startDebugLoop(settings, thresholds) {
   const tick = () => {
     if (!debugEnable.checked) return;
     const lat = parseFloat(debugLat.value);
@@ -90,7 +197,7 @@ function startDebugLoop() {
     heading = parseFloat(debugHeading.value) || 0;
     const speed = parseFloat(debugSpeed.value) || 0;
     if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
-      handlePosition(lat, lon, null, speed, heading);
+      handlePosition(lat, lon, null, speed, heading, settings, thresholds);
     }
   };
   tick();
@@ -99,9 +206,6 @@ function startDebugLoop() {
 
 function handleOrientation(event) {
   if (debugEnable.checked) return;
-  // webkitCompassHeading (iOS) is already a compass bearing (0 = North).
-  // The standard `alpha` is the rotation of the device around the z-axis;
-  // compass heading is approximately (360 - alpha).
   if (typeof event.webkitCompassHeading === 'number') {
     heading = event.webkitCompassHeading;
   } else if (typeof event.alpha === 'number') {
@@ -124,14 +228,32 @@ async function requestOrientationPermission() {
 }
 
 async function loadGeofence() {
-  const response = await fetch(GEOJSON_PATH);
-  const geojson = await response.json();
+  const stored = loadStoredGeojson();
+  let geojson;
+  if (stored) {
+    geojson = stored;
+  } else {
+    const response = await fetch(GEOJSON_PATH);
+    geojson = await response.json();
+  }
   const polygon = geojson.features[0].geometry.coordinates[0];
   return createGeofence(polygon);
 }
 
 async function start() {
   errorMessage.textContent = '';
+
+  const settings = readSettingsForm();
+  saveSettings(settings);
+
+  const thresholds = {
+    cautionM: settings.cautionM,
+    warningM: settings.warningM,
+    dangerOutsideM: settings.dangerOutsideM,
+    minSpeedMps: settings.minSpeedMps,
+    cautionTtbS: settings.cautionTtbS,
+    warningTtbS: settings.warningTtbS,
+  };
 
   try {
     geofence = await loadGeofence();
@@ -141,14 +263,14 @@ async function start() {
   }
 
   const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  beeper = createBeeper(audioContext);
+  beeper = createBeeper(audioContext, settings);
 
   await requestOrientationPermission();
 
   if (debugEnable.checked) {
-    startDebugLoop();
+    startDebugLoop(settings, thresholds);
   } else if (navigator.geolocation) {
-    startGeolocationWatch();
+    startGeolocationWatch(settings, thresholds);
   } else {
     showError('この端末では位置情報が利用できません');
     return;
@@ -159,3 +281,7 @@ async function start() {
 }
 
 startButton.addEventListener('click', start);
+
+// Initialize settings form on page load
+populateSettingsForm(loadSettings());
+updateGeojsonStatus();

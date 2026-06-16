@@ -3,15 +3,24 @@
 //   - frequencyHz: oscillator frequency
 //   - intervalMs: time between beep starts (ignored when continuous)
 //   - continuous: true for an unbroken alert tone
-const PATTERNS = {
+const DEFAULT_PATTERNS = {
   safe: null,
   caution: { frequencyHz: 440, intervalMs: 2000, continuous: false },
   warning: { frequencyHz: 880, intervalMs: 700, continuous: false },
   danger: { frequencyHz: 1320, intervalMs: 0, continuous: true },
 };
 
-export function getBeepPattern(state) {
-  return PATTERNS[state] ?? null;
+export function buildPatterns(settings) {
+  return {
+    safe: null,
+    caution: { frequencyHz: settings.cautionFreqHz, intervalMs: settings.cautionIntervalMs, continuous: false },
+    warning: { frequencyHz: settings.warningFreqHz, intervalMs: settings.warningIntervalMs, continuous: false },
+    danger: { frequencyHz: settings.dangerFreqHz, intervalMs: 0, continuous: true },
+  };
+}
+
+export function getBeepPattern(state, patterns = DEFAULT_PATTERNS) {
+  return patterns[state] ?? null;
 }
 
 const BEEP_DURATION_MS = 150;
@@ -19,7 +28,8 @@ const BEEP_DURATION_MS = 150;
 // Plays the beep pattern for a warning state using the Web Audio API.
 // Call setState() whenever the warning state changes; it stops any
 // previous sound before starting the new pattern.
-export function createBeeper(audioContext) {
+export function createBeeper(audioContext, settings) {
+  const patterns = settings ? buildPatterns(settings) : DEFAULT_PATTERNS;
   let timer = null;
   let oscillator = null;
   let gainNode = null;
@@ -61,7 +71,7 @@ export function createBeeper(audioContext) {
     stop();
     currentState = state;
 
-    const pattern = getBeepPattern(state);
+    const pattern = getBeepPattern(state, patterns);
     if (!pattern) return;
 
     if (pattern.continuous) {
