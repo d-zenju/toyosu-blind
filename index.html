@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ジオフェンス警告</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="start-screen">
+    <div>
+      <button id="start-button" type="button">開始</button>
+      <div id="error-message"></div>
+      <details id="debug-panel">
+        <summary>デバッグモード(位置・方位を手動入力)</summary>
+        <p>
+          <label>緯度 <input id="debug-lat" type="number" step="any" placeholder="35.649813"></label><br>
+          <label>経度 <input id="debug-lon" type="number" step="any" placeholder="139.794699"></label><br>
+          <label>方位(度) <input id="debug-heading" type="range" min="0" max="359" value="0"></label>
+          <span id="debug-heading-value">0</span>°<br>
+          <label>速度(m/s) <input id="debug-speed" type="range" min="0" max="10" step="0.1" value="1.4"></label>
+          <span id="debug-speed-value">1.4</span> m/s
+        </p>
+        <label><input id="debug-enable" type="checkbox"> 手動入力を使う</label>
+      </details>
+    </div>
+  </div>
+
+  <div id="status-screen">
+    <div id="accuracy-notice">GPS精度低下中</div>
+    <div id="state-label"></div>
+    <div id="direction-arrow">↑</div>
+    <div>
+      <span id="distance">--</span>
+      <span id="distance-label">m (最も近い境界まで)</span>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

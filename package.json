@@ -1,0 +1,10 @@
+{
+  "name": "toyosu-blind",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Geofence warning app for visually impaired users",
+  "scripts": {
+    "test": "node --test"
+  }
+}

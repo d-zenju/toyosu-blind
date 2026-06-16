@@ -1,0 +1,97 @@
+:root {
+  --color-safe: #2e7d32;
+  --color-caution: #f9a825;
+  --color-warning: #ef6c00;
+  --color-danger: #c62828;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Hiragino Sans", sans-serif;
+  background: #fff;
+  color: #111;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#start-screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#start-button {
+  font-size: 1.5rem;
+  padding: 1.5rem 3rem;
+  border-radius: 1rem;
+  border: none;
+  background: #1976d2;
+  color: #fff;
+  cursor: pointer;
+}
+
+#status-screen {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+#status-screen.state-safe { background: #e8f5e9; color: var(--color-safe); }
+#status-screen.state-caution { background: #fffde7; color: var(--color-caution); }
+#status-screen.state-warning { background: #fff3e0; color: var(--color-warning); }
+#status-screen.state-danger { background: var(--color-danger); color: #fff; }
+
+#state-label {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+#distance {
+  font-size: 4rem;
+  font-weight: bold;
+}
+
+#distance-label {
+  font-size: 1.25rem;
+}
+
+#direction-arrow {
+  font-size: 5rem;
+  transition: transform 0.2s ease;
+}
+
+#accuracy-notice {
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(0, 0, 0, 0.1);
+  display: none;
+}
+
+#accuracy-notice.visible {
+  display: block;
+}
+
+#error-message {
+  color: var(--color-danger);
+  font-size: 1.1rem;
+  padding: 1rem;
+  text-align: center;
+}
