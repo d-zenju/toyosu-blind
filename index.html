@@ -16,12 +16,10 @@
         <summary>設定（ローカル保存）</summary>
         <div class="settings-body">
           <h4>警告距離 (m)</h4>
-          <label>注意 <input id="s-caution-m" type="number" step="1" min="0"></label>
-          <label>警告 <input id="s-warning-m" type="number" step="1" min="0"></label>
-          <label>外側危険 <input id="s-danger-outside-m" type="number" step="1" min="0"></label>
+          <label>警告 (境界まで) <input id="s-warning-m" type="number" step="1" min="0"></label>
+          <label>危険 (境界まで) <input id="s-danger-inside-m" type="number" step="1" min="0"></label>
 
           <h4>時間予測</h4>
-          <label>注意TBB (秒) <input id="s-caution-ttb-s" type="number" step="1" min="0"></label>
           <label>警告TBB (秒) <input id="s-warning-ttb-s" type="number" step="1" min="0"></label>
           <label>最小速度 (m/s) <input id="s-min-speed-mps" type="number" step="0.1" min="0"></label>
 
@@ -29,8 +27,6 @@
           <label>精度警告閾値 (m) <input id="s-accuracy-warn-m" type="number" step="1" min="0"></label>
 
           <h4>ビープ音</h4>
-          <label>注意 周波数 (Hz) <input id="s-caution-freq-hz" type="number" step="10" min="100"></label>
-          <label>注意 間隔 (ms) <input id="s-caution-interval-ms" type="number" step="100" min="100"></label>
           <label>警告 周波数 (Hz) <input id="s-warning-freq-hz" type="number" step="10" min="100"></label>
           <label>警告 間隔 (ms) <input id="s-warning-interval-ms" type="number" step="100" min="100"></label>
           <label>危険 周波数 (Hz) <input id="s-danger-freq-hz" type="number" step="10" min="100"></label>

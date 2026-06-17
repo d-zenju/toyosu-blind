@@ -39,15 +39,11 @@ const debugHeadingValue = document.getElementById('debug-heading-value');
 const debugSpeed = document.getElementById('debug-speed');
 const debugSpeedValue = document.getElementById('debug-speed-value');
 
-const sCautionM = document.getElementById('s-caution-m');
 const sWarningM = document.getElementById('s-warning-m');
-const sDangerOutsideM = document.getElementById('s-danger-outside-m');
-const sCautionTtbS = document.getElementById('s-caution-ttb-s');
+const sDangerInsideM = document.getElementById('s-danger-inside-m');
 const sWarningTtbS = document.getElementById('s-warning-ttb-s');
 const sMinSpeedMps = document.getElementById('s-min-speed-mps');
 const sAccuracyWarnM = document.getElementById('s-accuracy-warn-m');
-const sCautionFreqHz = document.getElementById('s-caution-freq-hz');
-const sCautionIntervalMs = document.getElementById('s-caution-interval-ms');
 const sWarningFreqHz = document.getElementById('s-warning-freq-hz');
 const sWarningIntervalMs = document.getElementById('s-warning-interval-ms');
 const sDangerFreqHz = document.getElementById('s-danger-freq-hz');
@@ -74,15 +70,11 @@ function showError(message) {
 }
 
 function populateSettingsForm(settings) {
-  sCautionM.value = settings.cautionM;
   sWarningM.value = settings.warningM;
-  sDangerOutsideM.value = settings.dangerOutsideM;
-  sCautionTtbS.value = settings.cautionTtbS;
+  sDangerInsideM.value = settings.dangerInsideM;
   sWarningTtbS.value = settings.warningTtbS;
   sMinSpeedMps.value = settings.minSpeedMps;
   sAccuracyWarnM.value = settings.accuracyWarnM;
-  sCautionFreqHz.value = settings.cautionFreqHz;
-  sCautionIntervalMs.value = settings.cautionIntervalMs;
   sWarningFreqHz.value = settings.warningFreqHz;
   sWarningIntervalMs.value = settings.warningIntervalMs;
   sDangerFreqHz.value = settings.dangerFreqHz;
@@ -90,15 +82,11 @@ function populateSettingsForm(settings) {
 
 function readSettingsForm() {
   return {
-    cautionM: Number(sCautionM.value),
     warningM: Number(sWarningM.value),
-    dangerOutsideM: Number(sDangerOutsideM.value),
-    cautionTtbS: Number(sCautionTtbS.value),
+    dangerInsideM: Number(sDangerInsideM.value),
     warningTtbS: Number(sWarningTtbS.value),
     minSpeedMps: Number(sMinSpeedMps.value),
     accuracyWarnM: Number(sAccuracyWarnM.value),
-    cautionFreqHz: Number(sCautionFreqHz.value),
-    cautionIntervalMs: Number(sCautionIntervalMs.value),
     warningFreqHz: Number(sWarningFreqHz.value),
     warningIntervalMs: Number(sWarningIntervalMs.value),
     dangerFreqHz: Number(sDangerFreqHz.value),
@@ -247,11 +235,9 @@ async function start() {
   saveSettings(settings);
 
   const thresholds = {
-    cautionM: settings.cautionM,
     warningM: settings.warningM,
-    dangerOutsideM: settings.dangerOutsideM,
+    dangerInsideM: settings.dangerInsideM,
     minSpeedMps: settings.minSpeedMps,
-    cautionTtbS: settings.cautionTtbS,
     warningTtbS: settings.warningTtbS,
   };
 

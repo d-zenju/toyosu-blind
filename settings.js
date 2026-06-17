@@ -4,15 +4,11 @@ const STORAGE_KEY = 'toyosu-blind-settings';
 const GEOJSON_KEY = 'toyosu-blind-geojson';
 
 export const DEFAULT_SETTINGS = {
-  cautionM: THRESHOLDS.cautionM,
   warningM: THRESHOLDS.warningM,
-  dangerOutsideM: THRESHOLDS.dangerOutsideM,
+  dangerInsideM: THRESHOLDS.dangerInsideM,
   minSpeedMps: THRESHOLDS.minSpeedMps,
-  cautionTtbS: THRESHOLDS.cautionTtbS,
   warningTtbS: THRESHOLDS.warningTtbS,
   accuracyWarnM: ACCURACY_WARN_M,
-  cautionFreqHz: 440,
-  cautionIntervalMs: 2000,
   warningFreqHz: 880,
   warningIntervalMs: 700,
   dangerFreqHz: 1320,
